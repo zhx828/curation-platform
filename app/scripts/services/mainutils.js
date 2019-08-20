@@ -353,18 +353,13 @@ angular.module('oncokbApp')
                 });
             } else {
                 DatabaseConnector.getMainTypes().then(function(result1) {
-                    var mainTypeResult = _.map(result1, function(item) {
-                        return {
-                            name: item,
-                            code: 0
-                        };
-                    });
+                    var mainTypeResult = result1;
                     DatabaseConnector.getSubTypes().then(function(result2) {
                         var subtypeResult = [];
-                        _.each(result1, function(mainTypeName) {
+                        _.each(result1, function(mainType) {
                             var tempArr = [];
                             _.each(result2, function(item) {
-                                if (item.mainType && item.mainType.name && item.mainType.name === mainTypeName) {
+                                if (item.mainType && item.mainType.name && item.mainType.name === mainType.name) {
                                     tempArr.push(item);
                                 }
                             });

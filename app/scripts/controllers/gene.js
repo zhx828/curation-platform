@@ -3140,7 +3140,7 @@ angular.module('oncokbApp')
                         return $scope.oncoTree.mainTypes[i];
                     }
                 }
-                return '';
+                return null;
             }
 
             function findTumorTypeByMainType(index, mainType, callback) {
@@ -3687,7 +3687,7 @@ angular.module('oncokbApp')
                     return $scope.meta.oncoTree.mainTypes[i];
                 }
             }
-            return '';
+            return null;
         }
 
         function findSubtype(name) {
@@ -3732,9 +3732,27 @@ angular.module('oncokbApp')
         }
         $scope.tumorValidationCheck = function () {
             var tumorNameList = [];
-            _.each($scope.meta.mutation.tumors, function (tumor) {
+            _.each($scope.meta.mutation.tumors, function(tumor) {
                 tumorNameList.push(mainUtils.getFullCancerTypesName(tumor.cancerTypes));
             });
+            var tumorForms = _.pull(_.uniq($scope.meta.newCancerTypes.map(function(tumorType) {
+                if (tumorType.subtype && tumorType.subtype.code) {
+                    // main type
+                    return _.find($scope.meta.oncoTree.allTumorTypes, function(_tumorType) {
+                        return tumorType.subtype.code === _tumorType.code;
+                    }).tumorForm;
+                } else if (tumorType.mainType && tumorType.mainType.name) {
+                    var match = _.find($scope.meta.oncoTree.mainTypes, function(_maintype) {
+                        return _maintype.name === tumorType.mainType.name;
+                    });
+                    return match.tumorForm;
+                }
+            })), undefined);
+            if(tumorForms.length > 1) {
+                $scope.meta.message = 'Please only curate tumor types in the same tumor form.';
+                $scope.meta.invalid = true;
+                return;
+            }
             var currentTumorStr = mainUtils.getFullCancerTypesNames($scope.meta.newCancerTypes);
             if (!currentTumorStr) {
                 $scope.meta.message = 'Please input cancer type';

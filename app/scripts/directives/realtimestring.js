@@ -107,6 +107,9 @@ angular.module('oncokbApp')
                 }
             },
             controller: function ($scope) {
+                if($scope.tumor) {
+                    console.log($scope.tumor);
+                }
                 $scope.pureContent = {
                     text: ''
                 };
